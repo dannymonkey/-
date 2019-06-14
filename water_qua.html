@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<meta http-equiv="Refresh" content="300">
+<head>
+  <!-- Plotly.js -->
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+
+<h2>台北市各處水質監測站之水質酸鹼度, 餘氯以及水濁度資料圖形化介面</h2>
+<h3>資料每15分鐘更新一次</h3>
+
+<div id="demo">
+<button id = "button" type="button" onclick="loadXMLDoc()">Show Data</button>
+</div>
+
+<div id="myDiv">
+</div>
+<div id="demo2">
+</div>
+<div id="demo1">
+</div>
+<script>
+  var lon=[];
+  var lat=[];
+  var loc=[];
+  var cl = [];
+  var ph=[];
+  var cntu=[];
+  var date = [];
+  function loadXMLDoc() {
+  var xhttp = new XMLHttpRequest();
+  alert();
+  xhttp.onreadystatechange = function() {
+      var text = this.responseText;
+      var obj = JSON.parse(text)
+      document.getElementById("button").disabled=true;
+      document.getElementById("myDiv").innerHTML ="Last update time : "+obj.result.results[1].update_date+","+obj.result.results[1].update_time;
+      for(x in obj.result.results){
+        lon.push(obj.result.results[x].longitude);
+        lat.push(obj.result.results[x].latitude);
+        loc.push(obj.result.results[x].code_name);
+        cl.push(obj.result.results[x].qua_cl);
+        ph.push(obj.result.results[x].qua_ph);
+        cntu.push(obj.result.results[x].qua_cntu);
+
+        document.getElementById("demo1").innerHTML +=lon[x]+", "+lat[x]+", "+loc[x]+", "+ph[x]+", "+cl[x]+", "+cntu[x]+"<br>";
+      }
+    var data = [{
+      type:'scattermapbox',
+      lat:lat,
+      lon:lon,
+      mode:'markers',
+      name : 'location',
+      marker: {
+        size:14
+      },
+      text:loc
+    },
+    {
+      type:'scattermapbox',
+      lat:lat,
+      lon:lon,
+      mode:'markers',
+      name : 'PH',
+      marker: {
+        size:14
+      },
+      text:ph
+    },
+    {
+    type:'scattermapbox',
+    lat:lat,
+    lon:lon,
+    mode:'markers',
+    name : 'CL',
+    marker: {
+      size:14
+      },
+    text:cl
+    },
+    {
+    type:'scattermapbox',
+    lat:lat,
+    lon:lon,
+    mode:'markers',
+    name : 'cntu',
+    marker: {
+      size:14
+    },
+    text:cntu
+    }]
+    var layout = {
+      autosize: false,
+      width: 800,
+      height: 800,
+      mapbox: {
+      bearing:0,
+      center: {
+        lat:25.05,
+        lon:121.53
+      },
+      pitch:0,
+      zoom:11
+    },
+  }
+  Plotly.setPlotConfig({
+    mapboxAccessToken: 'pk.eyJ1IjoiZXRwaW5hcmQiLCJhIjoiY2luMHIzdHE0MGFxNXVubTRxczZ2YmUxaCJ9.hwWZful0U2CQxit4ItNsiQ'
+  })
+  Plotly.plot('demo2', data, layout, {showSendToCloud: true})
+  };
+
+
+
+  xhttp.open("GET", "https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=190796c8-7c56-42e0-8068-39242b8ec927", false);
+  xhttp.send();
+}
+
+</script>
+
+</body>
+</html>
